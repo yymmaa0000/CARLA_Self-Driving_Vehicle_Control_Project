@@ -168,7 +168,7 @@ class Controller2D(object):
             # Change these outputs with the longitudinal controller. Note that
             # brake_output is optional and is not required to pass the
             # assignment, as the car will naturally slow down over time.
-            throttle_output = 0
+            throttle_output = 0.5
             brake_output    = 0
 
             ######################################################
