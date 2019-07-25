@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""
+XingYu Wang
+Personal project - Self-Driving Vehicle Control
+Jul 24, 2019
+"""
 
 """
 2D Controller Class to be used for the CARLA waypoint follower demo.
