@@ -114,7 +114,25 @@ class Vehicle(Vehicle):
         # ==================================
         #  Implement vehicle model here
         # ==================================
-        pass
+        
+        # Integrate to find the current position, velocity, and engine speed first
+        self.x += self.v * self.sample_time
+        self.v += self.a * self.sample_time
+        self.w_e += self.w_e_dot * self.sample_time
+        
+        # then propagate those values into the set of equations.
+        Te = throttle * (self.a_0 + self.a_1 * self.w_e + self.a_2 * self.w_e * self.w_e)
+        F_aero = self.c_a * self.v * self.v
+        Rx = self.c_r1 * self.v
+        Fg = self.m * self.g * np.sin(alpha)
+        F_load = F_aero + Rx + Fg
+        self.w_e_dot = (Te - self.GR * self.r_e * F_load) / self.J_e
+        
+        ww = self.GR * self.w_e
+        s = (ww * self.r_e - self.v)/self.v
+        if abs(s) < 1: Fx = self.c * s
+        else: Fx = self.F_max
+        self.a = (Fx - F_load) / self.m
 
 
 # Using the model, you can send constant throttle inputs to the vehicle in the cell below. You will observe that the velocity converges to a fixed value based on the throttle input due to the aerodynamic drag and tire force limit. A similar velocity profile can be seen by setting a negative incline angle $\alpha$. In this case, gravity accelerates the vehicle to a terminal velocity where it is balanced by the drag force.
@@ -162,6 +180,9 @@ plt.show()
 time_end = 20
 t_data = np.arange(0,time_end,sample_time)
 x_data = np.zeros_like(t_data)
+y_data = np.zeros_like(t_data)
+throttle = np.zeros_like(t_data)
+alpha = np.zeros_like(t_data)
 
 # reset the states
 model.reset()
@@ -170,12 +191,53 @@ model.reset()
 #  Learner solution begins here
 # ==================================
 
+prev_y = 0
+prev_x = 0
+for i in range(t_data.shape[0]):
+    if t_data[i] <= 5:
+        throttle[i] = 0.2 + 0.3 / 5 * t_data[i]
+    elif t_data[i] <= 15:
+        throttle[i] = 0.5
+    else:
+        throttle[i] = 0.5 - 0.5/5*(t_data[i] - 15)
+    
+    displacement = model.x
+    
+    if displacement <= 60.075: alpha[i] = 0.0499583957
+    elif displacement <= 60.075+90.45: alpha[i] = 0.0996686525
+    else: alpha[i] = 0
+        
+    x_data[i] = displacement * np.cos(alpha[i])
+    y_data[i] = prev_y + (x_data[i] - prev_x) * np.tan(alpha[i])
+    prev_x = x_data[i]
+    prev_y = y_data[i]
+        
+    model.step(throttle[i], alpha[i])
+
 # ==================================
 #  Learner solution ends here
 # ==================================
 
 # Plot x vs t for visualization
 plt.plot(t_data, x_data)
+plt.title("X-driection displacement vs time")
+plt.xlabel("time")
+plt.ylabel("x displacement")
+plt.show()
+plt.plot(x_data, alpha)
+plt.title("alpha vs X-driection displacement")
+plt.xlabel("x displacement")
+plt.ylabel("alpha")
+plt.show()
+plt.plot(t_data, throttle)
+plt.title("Throttle vs time")
+plt.xlabel("time")
+plt.ylabel("throttle")
+plt.show()
+plt.plot(x_data, y_data)
+plt.title("x vs y")
+plt.xlabel("x")
+plt.ylabel("y")
 plt.show()
 
 
