@@ -205,6 +205,7 @@ class Controller2D(object):
             # the dynamic model is not used here, just pure tuning of the gains.
 
             L = 1.5
+            # use the middle point in the given waypoints as the look ahead target
             look_ahead = waypoints[len(waypoints)//2]
 
             ld = np.sqrt((look_ahead[0] - x)**2 + (look_ahead[1] - y)**2)
