@@ -168,7 +168,7 @@ class Controller2D(object):
             """
 
             # in this controller, we assume no braking, so brake_output is always 0
-            # We use PID method to design longitudinal controller
+            # We use PID + feedforward method for longitudinal controller
             # the dynamic model is not used here, just pure tuning of the gains
             kp = 0.2
             ki = 0.05
@@ -181,7 +181,20 @@ class Controller2D(object):
 
             self.vars.v_error_integral += v_error * dt
 
-            throttle_output = kp * v_error + ki * self.vars.v_error_integral + kd * v_error_derivative
+            feedback = kp * v_error + ki * self.vars.v_error_integral + kd * v_error_derivative
+
+            # calculate the feedforward(predicted) throttle, the data is collect by
+            # running CARLA simulation at diffferent throttle level and measuring car speed
+            look_ahead = waypoints[len(waypoints)-1]
+            v_desired_forward = look_ahead[2]
+            if v_desired_forward <= 6:
+            	feedforward = 0.15 + v_desired_forward/6*(0.6-0.15)
+            elif v_desired <= 11.5:
+            	feedforward = 0.6 + (v_desired_forward-6)/(11.5-6)*(0.8-0.6)
+            else:
+            	feedforward = 0.8 + (v_desired_forward-11.5)/85
+            
+            throttle_output = feedforward + feedback
             throttle_output = min(throttle_output,1)
             throttle_output = max(throttle_output,0)
 
@@ -201,23 +214,35 @@ class Controller2D(object):
                 example, can treat self.vars.v_previous like a "global variable".
             """
 
-            # in this controller, we use pure pursuit method to design lateral controller
+            # in this controller, we use Stanly method to design lateral controller
             # the dynamic model is not used here, just pure tuning of the gains.
 
             L = 1.5
+
+            angle_limit = 25 # in degree
+            angle_limit = angle_limit/180*np.pi # in rad
+            # use the middle point in the given waypoints as the look ahead target
             look_ahead = waypoints[len(waypoints)//2]
 
-            ld = np.sqrt((look_ahead[0] - x)**2 + (look_ahead[1] - y)**2)
+            yaw_desired = np.arctan2((look_ahead[1] - y),(look_ahead[0] - x)) 
+            yaw_diff = yaw_desired - yaw
+            if yaw_diff <= -np.pi: yaw_diff += 2*np.pi
+            elif yaw_diff >= np.pi: yaw_diff -= 2*np.pi
 
             vector_look_ahead = [look_ahead[0] - x,look_ahead[1] - y]
             vector_car = [np.cos(yaw),np.sin(yaw)]
             corss_track_error = np.cross(vector_look_ahead, vector_car)
 
-            curvature = 2/ld/ld*corss_track_error
+            k = 5 # gain factor
+            ks = 5 # softening constant
+            cross_track_angle = np.arctan(k * corss_track_error/(ks + v))
             
             # Change the steer output with the lateral controller. 
-            steer_output = np.arctan(curvature*L)
-            steer_output = -steer_output
+            steer_output = yaw_diff + cross_track_angle
+            steer_output = max(-angle_limit,steer_output)
+            steer_output = min(angle_limit,steer_output)
+
+            steer_output = -steer_output # CARLA works in the left-handed coordinate system
 
             ######################################################
             # SET CONTROLS OUTPUT
@@ -225,7 +250,7 @@ class Controller2D(object):
             self.set_throttle(throttle_output)  # in percent (0 to 1)
             self.set_steer(steer_output)        # in rad (-1.22 to 1.22)
             self.set_brake(brake_output)        # in percent (0 to 1)
-            #print(throttle_output,steer_output)
+            # print(yaw_desired/3.1415926*180,yaw/3.1415926*180,yaw_diff/3.1415926*180,cross_track_angle/3.1415926*180,steer_output/3.1415926*180)
 
         ######################################################
         ######################################################
