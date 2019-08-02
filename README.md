@@ -1,7 +1,7 @@
 # CARLA_Self-Driving_Vehicle_Control_Project
 This project aims to develop a vehicle controller to control the vehicle in CARLA simulator to follow a race track by navigating through preset waypoints. The vehicle needs to reach these waypoints at certain desired speeds, so both longitudinal and lateral control were implemented on the vehicle.
 
-This project is part of the Self-Driving Cars Specialization course in Coursera. The detail about this specialization can be found [here](https://www.coursera.org/specializations/self-driving-cars).
+This project is a part of the Self-Driving Cars Specialization course in Coursera. The detail about this specialization can be found [here](https://www.coursera.org/specializations/self-driving-cars).
 
 The performance of the controller was simulated using the CARLA simulator, which is a modified version of the original CARLA simulator with additional maps included. If you wish to try my controller yourself, please download and install this simulator following the instructions [here](https://www.coursera.org/learn/intro-self-driving-cars/supplement/pGdcu/carla-installation-guide). To learn how to use this simulator, you can refer to the project instruction from Coursera website [here](https://www.coursera.org/learn/intro-self-driving-cars/programming/ac8R5/final-project-self-driving-vehicle-control).
 
