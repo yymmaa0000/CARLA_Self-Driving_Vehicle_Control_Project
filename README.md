@@ -5,6 +5,8 @@ This project is a part of the Self-Driving Cars Specialization course in Courser
 
 The performance of the controller was simulated using the CARLA simulator, which is a modified version of the original CARLA simulator with additional maps included. If you wish to try my controller yourself, please download and install this simulator following the instructions [here](https://www.coursera.org/learn/intro-self-driving-cars/supplement/pGdcu/carla-installation-guide). To learn how to use this simulator, you can refer to the project instruction from Coursera website [here](https://www.coursera.org/learn/intro-self-driving-cars/programming/ac8R5/final-project-self-driving-vehicle-control).
 
+Before developing controllers, the dynamic model of the vehicle was derived using 2D bicycle model by hand. The detailed derivation of the vehicle model can be found in the “Vehicle Modeling” folder. A python code for a modeling practice can also be found in that folder, which implemented and simulated a longitudinal vehicle model.
+
 In this project, I implemented 3 different controllers, which are:
 1. PID for longitudinal and pure pursuit for lateral
 2. PID + feedforward for longitudinal and pure pursuit for lateral
