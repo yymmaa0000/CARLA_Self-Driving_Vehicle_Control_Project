@@ -10,9 +10,9 @@ In this project, I implemented 3 different controllers, which are:
 2. PID + feedforward for longitudinal and pure pursuit for lateral
 3. PID + feedforward for longitudinal and Stanley controller for lateral
 
-These three controllers were stored in the“Working Controllers”folder. By replacing the controller2d.py file in the main directory, you can simulate different controllers I wrote in CARLA. The simulation result for each controller is also stored in that folder.
+These three controllers were stored in the “Working Controllers” folder. By replacing the controller2d.py file in the main directory, you can simulate different controllers CARLA. The simulation result for each controller is also stored in that folder.
 
-The screen recording of the simulation for 2 of the controllers can also be viewed using the following link:
+The screen recording of the simulation for 2 controllers can also be viewed in YouTube:
 
 PID + feedforward for longitudinal and pure pursuit for lateral: https://youtu.be/u6LND5ZGQ9c
 
